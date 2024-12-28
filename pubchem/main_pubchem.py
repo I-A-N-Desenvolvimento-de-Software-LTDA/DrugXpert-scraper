@@ -75,5 +75,63 @@ def fetch_and_save_pubchem_substance_data(start_id, end_id, output_file):
         json.dump(results, json_file, indent=4)
     print(f"Data saved to {output_file}")
 
+def extract_fields_from_json(json_file):
+    """
+    Extracts specific fields ("RecordType", "RecordTitle") from a JSON file.
+
+    Args:
+        json_file (str): The path to the JSON file.
+
+    Returns:
+        list: A list of dictionaries containing the extracted fields.
+    """
+    extracted_data = []
+    
+    try:
+        with open(json_file, "r") as file:
+            data = json.load(file)
+            
+            for compound_id, compound_data in data.items():
+                record = compound_data.get("Record", {})
+                record_type = record.get("RecordType")
+                record_title = record.get("RecordTitle")
+                
+                if record_type and record_title:
+                    extracted_data.append({
+                        "RecordType": record_type,
+                        "RecordTitle": record_title
+                    })
+    except Exception as e:
+        print(f"Error reading {json_file}: {e}")
+    
+    return extracted_data
+
+def save_extracted_data_to_single_file(compound_data, substance_data, output_file):
+    """
+    Save the extracted data from compounds and substances into a single JSON file.
+
+    Args:
+        compound_data (list): The list of extracted compound data.
+        substance_data (list): The list of extracted substance data.
+        output_file (str): The path to save the data.
+    """
+    combined_data = {
+        "compounds": compound_data,
+        "substances": substance_data
+    }
+    
+    try:
+        with open(output_file, "w") as json_file:
+            json.dump(combined_data, json_file, indent=4)
+        print(f"All extracted data saved to {output_file}")
+    except Exception as e:
+        print(f"Error saving extracted data: {e}")
+
+
 fetch_and_save_pubchem_compound_data(1, 5, "pubchem_compound_data.json")
 fetch_and_save_pubchem_substance_data(1, 5, "pubchem_substance_data.json")
+
+compound_data = extract_fields_from_json("pubchem_compound_data.json")
+substance_data = extract_fields_from_json("pubchem_substance_data.json")
+
+save_extracted_data_to_single_file(compound_data, substance_data, "extracted_data.json")
