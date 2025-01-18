@@ -1,8 +1,34 @@
+"""
+PubChem Substance Data Processor
+
+This module handles the processing of substance data from PubChem's REST API.
+It includes functionality for fetching, transforming, and saving substance
+information.
+
+Features:
+- Fetches substance data from PubChem API
+- Removes unnecessary reference metadata
+- Extracts relevant substance information
+- Transforms data into standardized format
+- Saves final results to JSON
+
+Author: Israel Neto
+Date: 2024
+"""
+
 import requests
 import json
 
 def remove_references(data):
-    """Removes the "Reference" key from the data if it exists."""
+    """
+    Removes reference metadata from the PubChem data structure.
+    
+    Args:
+        data (dict/list): Raw PubChem data structure
+        
+    Returns:
+        dict/list: Cleaned data structure without references
+    """
     if isinstance(data, dict):
         if "Reference" in data:
             del data["Reference"]
@@ -13,7 +39,31 @@ def remove_references(data):
     return data
 
 def process_substance_data(start_id, end_id, output_file, source_type):
-    """Process substance data from start to end ID and save final result"""
+    """
+    Processes substance data from PubChem for a range of substance IDs.
+    
+    Args:
+        start_id (int): Starting substance ID
+        end_id (int): Ending substance ID
+        output_file (str): Path to output JSON file
+        source_type (str): Type identifier for the data source
+        
+    Output fields:
+        - type: Data type identifier
+        - place_loc: Source location identifier
+        - moleculeName: Substance name
+        - recordNumber: PubChem record number
+        - recordType: Type of record
+        - externalId: External identifier
+        - source: Data source
+        - sourceCategory: Source categories
+        - depositDate: Date of deposit
+        - modifyDate: Last modification date
+        - availableDate: Availability date
+        - status: Record status
+        - depositorComments: Depositor comments
+        - relatedCompounds: Related compound information
+    """
     # Fetch data
     results = {}
     for substance_id in range(start_id, end_id + 1):

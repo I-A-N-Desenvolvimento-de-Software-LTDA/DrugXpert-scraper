@@ -1,8 +1,34 @@
+"""
+PubChem Compound Data Processor
+
+This module handles the processing of compound data from PubChem's REST API.
+It includes functionality for fetching, transforming, and saving compound
+chemical information.
+
+Features:
+- Fetches compound data from PubChem API
+- Removes unnecessary reference metadata
+- Extracts relevant chemical information
+- Transforms data into standardized format
+- Saves final results to JSON
+
+Author: Israel Neto
+Date: 2024
+"""
+
 import requests
 import json
 
 def remove_references(data):
-    """Removes the "Reference" key from the data if it exists."""
+    """
+    Removes reference metadata from the PubChem data structure.
+    
+    Args:
+        data (dict/list): Raw PubChem data structure
+        
+    Returns:
+        dict/list: Cleaned data structure without references
+    """
     if isinstance(data, dict):
         if "Reference" in data:
             del data["Reference"]
@@ -13,7 +39,28 @@ def remove_references(data):
     return data
 
 def process_compound_data(start_id, end_id, output_file, source_type):
-    """Process compound data from start to end ID and save final result"""
+    """
+    Processes compound data from PubChem for a range of compound IDs.
+    
+    Args:
+        start_id (int): Starting compound ID
+        end_id (int): Ending compound ID
+        output_file (str): Path to output JSON file
+        source_type (str): Type identifier for the data source
+        
+    Output fields:
+        - type: Data type identifier
+        - place_loc: Source location identifier
+        - moleculeName: Chemical name
+        - recordNumber: PubChem record number
+        - smilesStructure: SMILES notation
+        - inchiString: InChI string
+        - inchiKey: InChI key
+        - molecularFormula: Chemical formula
+        - molecularWeight: Molecular mass
+        - drugBankId: DrugBank identifier
+        - categoryUsage: Drug usage category
+    """
     # Fetch data
     results = {}
     for compound_id in range(start_id, end_id + 1):
